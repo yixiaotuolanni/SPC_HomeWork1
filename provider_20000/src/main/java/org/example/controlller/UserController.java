@@ -28,4 +28,5 @@ public class UserController {
         commonResult.setResult(result);
         return commonResult;
     }
+
 }
