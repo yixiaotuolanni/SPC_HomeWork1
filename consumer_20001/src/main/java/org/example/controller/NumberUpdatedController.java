@@ -1,5 +1,8 @@
 package org.example.controller;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.annotation.Resource;
 import org.example.entity.CommonResult;
 import org.example.feign.CalculateFeignClient;
@@ -20,56 +23,59 @@ public class NumberUpdatedController {
     private CalculateFeignClient calculateFeignClient;
 
     @GetMapping("/getSum")
+    @CircuitBreaker(name = "circuitBreakerA",fallbackMethod = "fallbackGetSum")
     public CommonResult<Integer> getSum(@RequestParam(value = "A") Integer A,
                                         @RequestParam(value = "B") Integer B) {
         return calculateFeignClient.add(A,B);
     }
-//    @GetMapping("/getDifference")
-//    public CommonResult<Integer> getDifference(@RequestParam(value = "A") Integer A,
-//                                               @RequestParam(value = "B") Integer B) {
-//
-//        List<ServiceInstance> instanceList = discoveryClient.getInstances("provider");
-//        ServiceInstance serviceInstance = instanceList.get(0);
-//        URI url = serviceInstance.getUri();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        MultiValueMap<String, Integer> map= new LinkedMultiValueMap<>();
-//        map.add("A",A);
-//        map.add("B",B);
-//
-//        HttpEntity<MultiValueMap<String,Integer>> request = new HttpEntity<>(map,headers);
-//        return restTemplate.postForObject(url+"/calculate/sub",request,CommonResult.class);
-//    }
-//    @GetMapping("/getProduct")
-//    public void getProduct(@RequestParam(value = "A") Integer A,
-//                                            @RequestParam(value = "B") Integer B) {
-//
-//        List<ServiceInstance> instanceList = discoveryClient.getInstances("provider");
-//        ServiceInstance serviceInstance = instanceList.get(0);
-//        URI url = serviceInstance.getUri();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//
-//        MultiValueMap<String, Integer> map= new LinkedMultiValueMap<>();
-//        map.add("A",A);
-//        map.add("B",B);
-//
-//        HttpEntity<MultiValueMap<String,Integer>> request = new HttpEntity<>(map,headers);
-//        restTemplate.put(url+"/calculate/mul",request);
-//    }
-//
-//
-//    @GetMapping("/getQuotient")
-//    public void getQuotient(@RequestParam(value = "A") Integer A,
-//                                             @RequestParam(value = "B") Integer B) {
-//
-//        List<ServiceInstance> instanceList = discoveryClient.getInstances("provider");
-//        ServiceInstance serviceInstance = instanceList.get(0);
-//        URI url = serviceInstance.getUri();
-//
-//        restTemplate.delete(url+"/calculate/div?A="+A+"&"+"B="+B,CommonResult.class);
-//    }
+    public CommonResult<Integer> fallbackGetSum(Integer A, Integer B,Throwable T) {
+        CommonResult<Integer> result = new CommonResult<>();
+        result.setCode(404);
+        result.setResult(null);
+        result.setMessage("发生A服务降级");
+        System.out.println("发生A服务降级");
+        return result;
+    }
+    @GetMapping("/getDifference")
+    @CircuitBreaker(name = "circuitBreakerB",fallbackMethod = "fallbackGetDifference")
+    public CommonResult<Integer> getDifference(@RequestParam(value = "A") Integer A,
+                                               @RequestParam(value = "B") Integer B) {
+        return calculateFeignClient.subtract(A,B);
+    }
+    public CommonResult<Integer> fallbackGetDifference(Integer A, Integer B,Throwable T) {
+        CommonResult<Integer> result = new CommonResult<>();
+        result.setCode(404);
+        result.setResult(null);
+        result.setMessage("发生B服务降级");
+        System.out.println("发生B服务降级");
+        return result;
+    }
+    @GetMapping("/getSumV2")
+    @Bulkhead(name = "bulkheadC",fallbackMethod = "fallbackGetSumV2")
+    public CommonResult<Integer> getSumV2(@RequestParam(value = "A") Integer A,
+                                        @RequestParam(value = "B") Integer B) {
+        return calculateFeignClient.add(A,B);
+    }
+    public CommonResult<Integer> fallbackGetSumV2(Integer A, Integer B,Throwable T) {
+        CommonResult<Integer> result = new CommonResult<>();
+        result.setCode(404);
+        result.setResult(null);
+        result.setMessage("C CANT SEVER");
+        System.out.println("C发生隔离");
+        return result;
+    }
+    @GetMapping("/getSumV3")
+    @RateLimiter(name = "rateLimiterD",fallbackMethod = "fallbackGetSumV3")
+    public CommonResult<Integer> getSumV3(@RequestParam(value = "A") Integer A,
+                                          @RequestParam(value = "B") Integer B) {
+        return calculateFeignClient.add(A,B);
+    }
+    public CommonResult<Integer> fallbackGetSumV3(Integer A, Integer B,Throwable T) {
+        CommonResult<Integer> result = new CommonResult<>();
+        result.setCode(404);
+        result.setResult(null);
+        result.setMessage("D CANT SEVER");
+        System.out.println("D发生隔离");
+        return result;
+    }
 }

@@ -4,12 +4,14 @@ import org.example.entity.CommonResult;
 import org.example.entity.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Time;
+
 @RequestMapping("/calculate")
 @RestController
 public class CalculateController {
     @GetMapping("/add")
     public CommonResult<Integer> add(@RequestParam(value = "A") Integer A,
-                                     @RequestParam(value = "B") Integer B){
+                                     @RequestParam(value = "B") Integer B) throws InterruptedException {
         CommonResult<Integer> commonResult = new CommonResult<>();
         Integer code;
         String message;
@@ -24,6 +26,7 @@ public class CalculateController {
             message = "defeat";
             result = null;
         }
+        Thread.sleep(3000l);
         commonResult.setCode(code);
         commonResult.setMessage(message + "/t20000接口");
         commonResult.setResult(result);
@@ -31,7 +34,7 @@ public class CalculateController {
     }
     @PostMapping("/sub")
     public CommonResult<Integer> subtract(@RequestParam(value = "A") Integer A,
-                                     @RequestParam(value = "B") Integer B){
+                                     @RequestParam(value = "B") Integer B) throws InterruptedException {
         CommonResult<Integer> commonResult = new CommonResult<>();
         Integer code;
         String message;
@@ -46,6 +49,7 @@ public class CalculateController {
             message = "defeat";
             result = null;
         }
+        Thread.sleep(3000l);
         commonResult.setCode(code);
         commonResult.setMessage(message);
         commonResult.setResult(result);
