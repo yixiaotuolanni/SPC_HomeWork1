@@ -28,6 +28,7 @@ public class UserController {
                                       @RequestParam(value = "name") String name,
                                       @RequestParam(value = "password") String password) {
 
+
         List<ServiceInstance> instanceList = discoveryClient.getInstances("provider");
         ServiceInstance serviceInstance = instanceList.get(0);
         URI url = serviceInstance.getUri();
@@ -35,7 +36,7 @@ public class UserController {
         User user = new User();
         user.setId(id);
         user.setPassword(password);
-        user.setName(name);
+        user.setName(name+"由第二个consumer处理");
         return restTemplate.postForObject(url+"/userDao/newUser",user,CommonResult.class);
     }
 }

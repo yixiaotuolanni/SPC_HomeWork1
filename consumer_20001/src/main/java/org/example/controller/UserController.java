@@ -34,7 +34,7 @@ public class UserController {
         User user = new User();
         user.setId(id);
         user.setPassword(password);
-        user.setName(name);
+        user.setName(name+"由第一个consumer处理");
         return restTemplate.postForObject(url+"/userDao/newUser",user,CommonResult.class);
     }
 }

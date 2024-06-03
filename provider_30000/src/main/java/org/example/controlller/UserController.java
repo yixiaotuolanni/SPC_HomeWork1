@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/userDao")
 public class UserController {
     @PostMapping ("/newUser")
-    public CommonResult<User> getUserById(@RequestBody User user){
+    public CommonResult<User> getUserById(@RequestBody User user) throws InterruptedException {
         CommonResult<User> commonResult = new CommonResult<User>();
         Integer code;
         String message;
@@ -16,13 +16,14 @@ public class UserController {
         try{
             // 将user存储进入数据库
             code = 200;
-            message = "user缓存成功";
+            message = "user在30000端口缓存成功";
             result = user;
         }catch (Exception e){
             code = 500;
             message = "defeat";
             result = null;
         }
+        Thread.sleep(3000l);
         commonResult.setCode(code);
         commonResult.setMessage(message);
         commonResult.setResult(result);
