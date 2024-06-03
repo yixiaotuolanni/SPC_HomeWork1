@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.example</groupId>
-    <artifactId>Config_15000</artifactId>
+    <artifactId>Config_15001</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

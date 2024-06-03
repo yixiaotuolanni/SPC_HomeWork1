@@ -16,6 +16,7 @@
         <module>eureka_10000</module>
         <module>eureka_10001</module>
         <module>Config_15000</module>
+        <module>Config_15001</module>
     </modules>
 
     <properties>

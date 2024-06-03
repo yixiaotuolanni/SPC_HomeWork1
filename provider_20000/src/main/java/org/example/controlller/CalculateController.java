@@ -2,11 +2,16 @@ package org.example.controlller;
 
 import org.example.entity.CommonResult;
 import org.example.entity.User;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/calculate")
 @RestController
+@RefreshScope
 public class CalculateController {
+    @Value("${msg}")
+    private String msg;
     @GetMapping("/add")
     public CommonResult<Integer> add(@RequestParam(value = "A") Integer A,
                                      @RequestParam(value = "B") Integer B){
@@ -17,7 +22,7 @@ public class CalculateController {
         try{
             // 将user存储进入数据库
             code = 200;
-            message = "计算两数之和";
+            message = "计算两数之和;msg:"+msg;
             result = A+B;
         }catch (Exception e){
             code = 500;
@@ -25,7 +30,7 @@ public class CalculateController {
             result = null;
         }
         commonResult.setCode(code);
-        commonResult.setMessage(message + "/t20000接口");
+        commonResult.setMessage(message + "\t20000接口");
         commonResult.setResult(result);
         return commonResult;
     }
